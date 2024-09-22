@@ -12,6 +12,7 @@ func main() {
 	myVegis := []string{"Potato", "Tomato", "Ginger"}
 	fmt.Println("The list of myFruits", myVegis)
 	fmt.Printf("The variable type of myFruits is:%T\n", myVegis)
+	fmt.Println("Change here")
 	myLang := make([]int, 3)
 	myLang[0] = 12
 	myLang[1] = 13
