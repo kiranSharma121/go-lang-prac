@@ -5,8 +5,8 @@ import (
 )
 
 func main() {
-	fmt.Println("welcome to maps in golang")
-	myFruits := [3]string{"Apple", "Mango", "Orange"}
+	fmt.Println("welcome to maps in aakash")
+	myFruits := [3]string{"Apple", "aakash", "Orange"}
 	fmt.Println("The list of myFruits", myFruits)
 	fmt.Printf("The variable type of myFruits is:%T\n", myFruits)
 	myVegis := []string{"Potato", "Tomato", "Ginger"}
