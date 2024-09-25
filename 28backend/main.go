@@ -38,6 +38,7 @@ func main() {
 	r.HandleFunc("/subject/{code}", getOneSubject).Methods("GET")
 	r.HandleFunc("/subject", createOneSubject).Methods("POST")
 	r.HandleFunc("/subject/{code}", upDateOneSubject).Methods("PUT")
+	r.HandleFunc("/subject/{code}", deleteOneSubjet).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":8080", r))
 
 }
@@ -90,6 +91,18 @@ func upDateOneSubject(w http.ResponseWriter, r *http.Request) {
 			subject = append(subject, Subjects)
 			json.NewEncoder(w).Encode(Subjects)
 		}
+
+	}
+}
+func deleteOneSubjet(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-Type", "application/json")
+	params := mux.Vars(r)
+	for index, value := range subject {
+		if value.SubjectCode == params["code"] {
+			subject = append(subject[:index], subject[index+1:]...)
+			break
+		}
+		json.NewEncoder(w).Encode(subject)
 
 	}
 }
