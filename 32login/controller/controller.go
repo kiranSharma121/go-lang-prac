@@ -112,3 +112,27 @@ func Deleteoneuser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(params["id"])
 
 }
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+
+}
+func Loginhandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		email := r.FormValue("email")
+		password := r.FormValue("password")
+
+		var user model.Auth
+		err := database.Collection.FindOne(context.TODO(), bson.M{"email": email}).Decode(&user)
+		if err != nil {
+			http.Error(w, "User not found", http.StatusUnauthorized)
+			return
+		}
+		if checkPasswordHash(password, user.Password) {
+			fmt.Fprintf(w, "login sucessful")
+		} else {
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+
+		}
+	}
+}

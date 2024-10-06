@@ -46,7 +46,6 @@ func main() {
 	r.HandleFunc("/course/{Id}", updateonecourse).Methods("PUT")
 	//listen to a port
 	log.Fatal(http.ListenAndServe(":4000", r))
-
 }
 
 func serveHome(w http.ResponseWriter, r *http.Request) {
