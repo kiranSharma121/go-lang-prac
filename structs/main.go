@@ -2,31 +2,27 @@ package main
 
 import "fmt"
 
-type User struct {
-	FirstName   string
-	SecondName  string
-	DateOfBirth string
+type user struct {
+	firstName   string
+	secondName  string
+	dateOfBirth string
 }
 
 func main() {
-	fmt.Println("welcome to the golang series")
-	firstName := getUserInfo("Enter the firstname:")
-	secondName := getUserInfo("Enter the secondname:")
-	dateOfBirth := getUserInfo("Enter the dateOfBirth:")
-	var appUser User
-	appUser = User{
-		FirstName:   firstName,
-		SecondName:  secondName,
-		DateOfBirth: dateOfBirth,
+	fmt.Println("welcome to the struct in go")
+	firstName := getUserDetails("Enter your firstName:")
+	secondName := getUserDetails("Enter your secondName:")
+	dateOfBirth := getUserDetails("Enter your date of birth in MM//DD//YY format:")
+	var appUser = user{
+		firstName,
+		secondName,
+		dateOfBirth,
 	}
-	userDetails(appUser)
+	fmt.Println(appUser)
 }
-func userDetails(u User) {
-	fmt.Println(u.FirstName, u.SecondName, u.DateOfBirth)
-}
-func getUserInfo(info string) string {
-	fmt.Print(info)
-	var data string
-	fmt.Scan(&data)
-	return data
+func getUserDetails(text string) string {
+	fmt.Print(text)
+	var value string
+	fmt.Scanln(&value)
+	return value
 }
