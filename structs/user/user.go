@@ -10,6 +10,11 @@ type User struct {
 	secondName  string
 	dateOfBirth string
 }
+type Admin struct {
+	email    string
+	password string
+	User
+}
 
 func (u User) PrintUserDetails() {
 	fmt.Printf("Hi %v %v welcome to the struct in go and your date of birth is %v\n", u.firstName, u.secondName, u.dateOfBirth)
@@ -30,4 +35,15 @@ func NewUser(userfirstName, usersecondName, userdateOfBirth string) (*User, erro
 		usersecondName,
 		userdateOfBirth,
 	}, nil
+}
+func Newadmin(email, password string) *Admin {
+	return &Admin{
+		email:    email,
+		password: password,
+		User: User{
+			firstName:   "kiran",
+			secondName:  "sharma",
+			dateOfBirth: "11/11/11",
+		},
+	}
 }
