@@ -91,7 +91,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	if verifypassword(registeruser.Password, user.Password) {
-		tokenString, err := middleware.GenerateToken(user.Username, user.Email)
+		tokenString, err := middleware.GenerateToken(user.Username, user.Email, user.Role)
 		if err != nil {
 			c.JSON(http.StatusBadGateway, gin.H{
 				"message": "Error in generating the token",

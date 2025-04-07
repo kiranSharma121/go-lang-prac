@@ -4,31 +4,54 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
+const fileName = "balance.txt"
+
+func getBalanceFromFile() (float64, error) {
+	data, err := os.ReadFile(fileName)
+	if err != nil {
+		return 1000, err
+	}
+	balancestring := string(data)
+	balance, err := strconv.ParseFloat(balancestring, 64)
+	if err != nil {
+		return 1000, err
+	}
+	return balance, nil
+
+}
+
+func writeBalanceToFile(balance float64) {
+	balanceText := fmt.Sprint(balance)
+	os.WriteFile(fileName, []byte(balanceText), 0644)
+}
 func main() {
-	var CurrentBalance = 1000.0
-	var passcode int
-	var pincode = 1234
+	var CurrentBalance, err = getBalanceFromFile()
+	if err != nil {
+		fmt.Println("Error")
+		fmt.Println(err)
+		fmt.Println("-----")
+	}
+	var passcode string
+	var pincode = "1234"
 	var userName string
 	fmt.Print("Enter Your FullName:")
 	reader := bufio.NewReader(os.Stdin)
 	userName, _ = reader.ReadString('\n')
 	userName = strings.TrimSpace(userName)
 	fmt.Println("Welcome", userName, "to the Go bank!!!")
-	for i := 0; i < 200; i++ {
+
+	for {
 		fmt.Print("Enter your Pincode:")
 		fmt.Scan(&passcode)
 		if passcode != pincode {
 			fmt.Println("Wrong pincode")
 			continue
 		}
-		fmt.Println("What do you want to do?")
-		fmt.Println("1.Check Bank Balance")
-		fmt.Println("2.Deposite Money")
-		fmt.Println("3.Withdraw Money")
-		fmt.Println("4.Exit")
+		PresentCode()
 		var choice int
 		fmt.Print("Enter your choice:")
 		fmt.Scan(&choice)
@@ -45,6 +68,7 @@ func main() {
 			}
 			CurrentBalance += Deposite
 			fmt.Println("Balance updated!Your new balance is:", CurrentBalance)
+			writeBalanceToFile(CurrentBalance)
 		} else if choice == 3 {
 			var Withdraw float64
 			fmt.Print("Enter the Amount:")
@@ -59,6 +83,7 @@ func main() {
 			}
 			CurrentBalance -= Withdraw
 			fmt.Println("Balance updated!Your new balance is:", CurrentBalance)
+			writeBalanceToFile(CurrentBalance)
 
 		} else {
 			fmt.Println("Welcome Back to Home page")

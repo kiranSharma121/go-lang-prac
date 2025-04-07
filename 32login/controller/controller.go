@@ -117,6 +117,7 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 
 }
+
 func Loginhandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		email := r.FormValue("email")

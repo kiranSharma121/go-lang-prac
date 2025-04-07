@@ -23,7 +23,7 @@ func main() {
 	sort.Ints(examMarks)
 	fmt.Println("The slice of examMarks after sort:", examMarks)
 	fmt.Println(sort.IntsAreSorted(examMarks))
-	examMarks = append(examMarks[1:])
+	examMarks = append(examMarks[2:])
 	fmt.Println("The sliced examMarks is:", examMarks)
 
 	var myVegis = []string{"potato", "Tomato", "ginger", "radice"}

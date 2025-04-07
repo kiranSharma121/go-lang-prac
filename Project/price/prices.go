@@ -2,6 +2,7 @@ package price
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -45,6 +46,7 @@ func (job *TaxIncludedPriceJob) Loadder() {
 		prices[lineIndex] = floatPrice
 	}
 	job.InputPrices = prices
+	file.Close()
 
 }
 
@@ -55,7 +57,8 @@ func (job TaxIncludedPriceJob) Process() {
 		taxIncludedPrice := price * (1 + job.TaxRate)
 		result[fmt.Sprintf("%.2f", price)] = fmt.Sprintf("%.2f", taxIncludedPrice)
 	}
-	fmt.Println(result)
+	WriteJSON("result.json", job)
+
 }
 
 func NewTaxIncludedPriceJob(taxRate float64) *TaxIncludedPriceJob {
@@ -64,4 +67,20 @@ func NewTaxIncludedPriceJob(taxRate float64) *TaxIncludedPriceJob {
 		InputPrices:       []float64{10, 20, 30},
 		TaxIncludedPrices: make(map[string]float64),
 	}
+}
+
+func WriteJSON(filename string, data any) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		fmt.Println("Error in creating a file")
+		return err
+	}
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(data)
+	if err != nil {
+		fmt.Println("fail to convert data into json")
+	}
+	file.Close()
+	return nil
+
 }

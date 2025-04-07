@@ -1,0 +1,3 @@
+EBT:1000
+Profit:990
+Ratio:1

@@ -11,6 +11,7 @@ func Router() *gin.Engine {
 	router.GET("/", controller.ServeHome)
 	router.POST("/signup", controller.Signup)
 	router.POST("/login", controller.Login)
-	router.GET("/dashboard", middleware.AuthMiddleware(), middleware.Dashboard)
+	router.GET("/student/dashboard", middleware.AuthMiddleware("Student"), middleware.Studentdashboard)
+	router.GET("/teacher/dashboard", middleware.AuthMiddleware("Teacher"), middleware.Teacherdashboard)
 	return router
 }

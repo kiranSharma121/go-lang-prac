@@ -7,4 +7,5 @@ func Router(server *gin.Engine) {
 	server.POST("/events", CreateEvents)
 	server.GET("/events/:id", GetEvent)
 	server.PUT("/events/:id", UpDateEvent)
+	server.DELETE("/events/:id", DeleteEvent)
 }

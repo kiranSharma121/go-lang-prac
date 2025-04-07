@@ -6,27 +6,21 @@ import (
 )
 
 func main() {
-	// dones := make([]chan bool, 3)
 	done := make(chan bool)
-	// dones[0] = make(chan bool)
-	go slowGreet("How are you!", done)
-	// dones[1] = make(chan bool)
-	go Greet("Nice to meet you!", done)
-	// dones[2] = make(chan bool)
-	go Greet("How...are...you...???", done)
+	go Greeter("How are you??", done)
+	go slowGreeter("welcome to the golang", done)
+	go Greeter("how....are...you???", done)
 	for range done {
 
 	}
-
 }
-func slowGreet(info string, done chan bool) {
+func Greeter(info string, done chan bool) {
+	fmt.Println("Hello", info)
+	done <- true
+}
+func slowGreeter(info string, done chan bool) {
 	time.Sleep(3 * time.Second)
-	fmt.Println("Hello!", info)
+	fmt.Println("Hello", info)
 	done <- true
 	close(done)
-}
-func Greet(info string, done chan bool) {
-	fmt.Println("Hello!", info)
-	done <- true
-
 }
