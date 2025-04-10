@@ -7,7 +7,7 @@ import (
 )
 
 type Events struct {
-	Id       int64
+	Id       int64  `json:"id" gorm:"primaryKey"`
 	Username string `json:"username" binding:"required"`
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
@@ -71,5 +71,15 @@ func (e Events) UpDateEvents() error {
 	}
 	defer stmt.Close()
 	_, err = stmt.Exec(e.Id, e.Username, e.Email, e.Password, e.Userid, e.Time) //when we insert data in the database
+	return err
+}
+func (e Events) Delete() error {
+	query := `DELETE FROM events WHERE id=?`
+	stmt, err := database.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(e.Id)
 	return err
 }

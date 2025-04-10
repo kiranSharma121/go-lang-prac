@@ -17,6 +17,7 @@ func main() {
 	server.POST("/events", CreateEvent)
 	server.GET("/events/:id", GetEvent)
 	server.PUT("/events/:id", UpDateEvent)
+	server.DELETE("/events/:id", DeleteEvent)
 	server.Run(":8080")
 }
 func GetEvents(c *gin.Context) {
@@ -104,4 +105,30 @@ func UpDateEvent(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, upDatedEvent)
+}
+func DeleteEvent(c *gin.Context) {
+	eventid, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid params",
+		})
+		return
+	}
+	event, err := models.GetEventByID(int(eventid))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "can't get event by the given id",
+		})
+		return
+	}
+	err = event.Delete()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "can't delete event from the database",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Deleted the event from the database",
+	})
 }
