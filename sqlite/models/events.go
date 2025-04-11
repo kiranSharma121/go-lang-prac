@@ -1,20 +1,34 @@
 package models
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/sqlite/database"
+	"golang.org/x/crypto/bcrypt"
 )
 
-type Events struct {
-	Id       int64  `json:"id" gorm:"primaryKey"`
-	Username string `json:"username" binding:"required"`
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
-	Userid   int    `json:"userid" binding:"required"`
-	Time     time.Time
+func (u *User) Save() error {
+	query := `INSERT INTO users(email,password) VALUES(?,?)`
+	stmt, err := database.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	hasedpassword, err := HasedPassword(u.Password)
+	if err != nil {
+		return err
+	}
+	result, err := stmt.Exec(u.Email, hasedpassword)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	u.Id = id
+	return err
 }
-
 func (e *Events) Save() error {
 	query := "INSERT INTO events(username,email,password,userid,time)VALUES(?,?,?,?,?)"
 	stmt, err := database.DB.Prepare(query)
@@ -82,4 +96,61 @@ func (e Events) Delete() error {
 	defer stmt.Close()
 	_, err = stmt.Exec(e.Id)
 	return err
+}
+func HasedPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+func CompareHasedPassword(password, hashedPassword string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	return err == nil
+}
+func (u User) ValidateCredentials() error {
+	query := `SELECT id,email, password FROM users WHERE email=?`
+	row := database.DB.QueryRow(query, u.Email)
+
+	var email, retrievedPassword string
+	err := row.Scan(&u.Id, &email, &retrievedPassword)
+	if err != nil {
+		return err
+	}
+
+	passwordIsValid := CompareHasedPassword(u.Password, retrievedPassword)
+	if !passwordIsValid {
+		return fmt.Errorf("invalid password")
+	}
+
+	return nil
+}
+
+var secretKey = []byte("meronamekiranho")
+
+func GenerateJwtToken(email string, id int64) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email":  email,
+		"id":     id,
+		"expire": time.Now().Add(time.Hour * 2).Unix(),
+	})
+	return token.SignedString(secretKey)
+}
+func VerifyToken(token string) (int64, error) {
+	parsedToken, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+		// Check if the signing method is HMAC
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unauthorized signing method")
+		}
+		return []byte(secretKey), nil
+	})
+
+	// Check for parsing error
+	if err != nil {
+		return 0, err
+	}
+
+	// Check if token is nil or invalid
+	if parsedToken == nil || !parsedToken.Valid {
+		return 0, err
+	}
+	return 0, err
+
 }
