@@ -45,8 +45,17 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
+	token, err := models.GenerateJwtToken(user.UserName, user.Email, user.Id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "couldn't authenticate the user",
+			"error":   err.Error(),
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login successful....",
+		"Token":   token,
 	})
 
 }

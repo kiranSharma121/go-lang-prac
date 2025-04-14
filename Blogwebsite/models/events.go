@@ -2,8 +2,11 @@ package models
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/goVendor/database"
+
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -50,4 +53,16 @@ func (u User) ValidateCredentials() error {
 	}
 	return nil
 
+}
+
+var secretKey = []byte("kiran is my name")
+
+func GenerateJwtToken(username, email string, id int64) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username": username,
+		"email":    email,
+		"id":       id,
+		"expire":   time.Now().Add(time.Hour * 2).Unix(),
+	})
+	return token.SignedString(secretKey)
 }
