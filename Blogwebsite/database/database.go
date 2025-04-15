@@ -34,6 +34,7 @@ func CreateTable() {
 
 	createPostTable := `CREATE TABLE IF NOT EXISTS posts (
 		postid INTEGER PRIMARY KEY AUTOINCREMENT,
+		author TEXT NOT NULL,
 		title TEXT NOT NULL,
 		content TEXT NOT NULL
 	);`
