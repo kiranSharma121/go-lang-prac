@@ -1,10 +1,11 @@
 package models
 
 type Post struct {
-	Postid  int64  `json:"postid"`
-	Author  string `json:"author" binding:"required"`
-	Title   string `json:"title" binding:"required"`
-	Content string `json:"content" binding:"required"`
+	Postid   int64  `json:"postid"`
+	Authorid int    `json:"authorid"`
+	Author   string `json:"author" binding:"required"`
+	Title    string `json:"title" binding:"required"`
+	Content  string `json:"content" binding:"required"`
 }
 type User struct {
 	Id       int64  `json:"id"`

@@ -30,11 +30,12 @@ func (u *User) Save() error {
 	u.Id = id
 	return err
 }
-func (u User) ValidateCredentials() error {
-	query := `SELECT email,password FROM users WHERE email=?`
+func (u *User) ValidateCredentials() error {
+	query := `SELECT id, email, password FROM users WHERE email=?`
 	row := database.DB.QueryRow(query, u.Email)
+	var id int64
 	var email, retrivePassword string
-	err := row.Scan(&email, &retrivePassword)
+	err := row.Scan(&id, &email, &retrivePassword)
 	if err != nil {
 		return err
 	}
@@ -42,23 +43,42 @@ func (u User) ValidateCredentials() error {
 	if !isPasswordValid {
 		return fmt.Errorf("invalid password")
 	}
+	u.Id = id
 	return nil
-
 }
 func (p *Post) Save() error {
-	query := `INSERT INTO posts(author,title,content)VALUES(?,?,?)`
+	query := `INSERT INTO posts(authorid,author,title,content)VALUES(?,?,?,?)`
 	stmt, err := database.DB.Prepare(query)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
-	result, err := stmt.Exec(p.Author, p.Title, p.Content)
+	result, err := stmt.Exec(p.Authorid, p.Author, p.Title, p.Content)
 	if err != nil {
 		return err
 	}
 	id, err := result.LastInsertId()
 	p.Postid = id
 	return err
+}
+func GetAllPost() ([]Post, error) {
+	query := `SELECT * FROM posts`
+	row, err := database.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer row.Close()
+	var posts []Post
+	for row.Next() {
+		var post Post
+		err := row.Scan(&post.Postid, &post.Authorid, &post.Author, &post.Title, &post.Content)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
+
 }
 func HasedPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -94,5 +114,15 @@ func VerifyToken(token string) (int64, error) {
 	if parsedToken == nil || !parsedToken.Valid {
 		return 0, err
 	}
-	return 0, nil
+	claims, ok := parsedToken.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, errors.New("invalid token claims")
+	}
+
+	// ✅ Get userId from claims
+	userIdFloat, ok := claims["id"].(float64)
+	if !ok {
+		return 0, errors.New("userId not found in token")
+	}
+	return int64(userIdFloat), nil
 }

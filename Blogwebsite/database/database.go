@@ -22,8 +22,8 @@ func InitDB() {
 func CreateTable() {
 	createUserTable := `CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-		username TEXT NOT NULL UNIQUE ,
-		email TEXT NOT NULL,
+		username TEXT NOT NULL  ,
+		email TEXT NOT NULL UNIQUE,
 		password TEXT NOT NULL
 	);`
 
@@ -34,9 +34,11 @@ func CreateTable() {
 
 	createPostTable := `CREATE TABLE IF NOT EXISTS posts (
 		postid INTEGER PRIMARY KEY AUTOINCREMENT,
+		authorid INTEGER NOT NULL,
 		author TEXT NOT NULL,
 		title TEXT NOT NULL,
-		content TEXT NOT NULL
+		content TEXT NOT NULL,
+		  FOREIGN KEY (authorid) REFERENCES users(id) ON DELETE CASCADE
 	);`
 
 	_, err = DB.Exec(createPostTable)

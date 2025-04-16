@@ -22,7 +22,7 @@ func Authentication(c *gin.Context) {
 		})
 		return
 	}
-	c.Set("userid", userid)
+	c.Set("userId", userid)
 	c.Next()
 
 }

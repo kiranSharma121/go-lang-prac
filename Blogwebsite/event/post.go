@@ -16,6 +16,9 @@ func CreatePost(c *gin.Context) {
 		})
 		return
 	}
+	userid := c.GetInt64("userId")
+	post.Authorid = int(userid)
+
 	err = post.Save()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -28,4 +31,14 @@ func CreatePost(c *gin.Context) {
 		"message": "stored data in the database",
 	})
 
+}
+func GetPosts(c *gin.Context) {
+	post, err := models.GetAllPost()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to get post from the database",
+			"error":   err.Error(),
+		})
+	}
+	c.JSON(http.StatusOK, post)
 }
