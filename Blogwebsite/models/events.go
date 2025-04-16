@@ -118,8 +118,6 @@ func VerifyToken(token string) (int64, error) {
 	if !ok {
 		return 0, errors.New("invalid token claims")
 	}
-
-	// ✅ Get userId from claims
 	userIdFloat, ok := claims["id"].(float64)
 	if !ok {
 		return 0, errors.New("userId not found in token")
