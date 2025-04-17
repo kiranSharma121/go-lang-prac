@@ -78,6 +78,7 @@ func UpDatePosts(c *gin.Context) {
 		return
 	}
 	upDatePost.Postid = postid
+	upDatePost.Authorid = post.Authorid
 	err = upDatePost.UpDatePost()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -88,5 +89,40 @@ func UpDatePosts(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "updated post in the database sucessfully",
+	})
+}
+func DeletePosts(c *gin.Context) {
+	postid, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "invalid params",
+			"error":   err.Error(),
+		})
+	}
+	userid := c.GetInt64("userId")
+	post, err := models.GetPostById(int(postid))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to get data from the given id",
+			"error":   err.Error(),
+		})
+		return
+	}
+	if post.Postid != userid {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "unauthorized id",
+		})
+		return
+	}
+	err = post.DeletePost()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "can't delete the post form the database",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "delete the post form the database",
 	})
 }

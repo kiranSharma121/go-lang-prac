@@ -101,6 +101,15 @@ func (p Post) UpDatePost() error {
 	return err
 
 }
+func (p Post) DeletePost() error {
+	query := `DELETE FROM posts WHERE postid=?`
+	stmt, err := database.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(p.Postid)
+	return err
+}
 func HasedPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err

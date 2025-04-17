@@ -13,5 +13,6 @@ func Router() *gin.Engine {
 	server.POST("/posts", middleware.Authentication, event.CreatePost)
 	server.GET("/posts", event.GetPosts)
 	server.PUT("/posts/:id", middleware.Authentication, event.UpDatePosts)
+	server.DELETE("/posts/:id", middleware.Authentication, event.DeletePosts)
 	return server
 }
