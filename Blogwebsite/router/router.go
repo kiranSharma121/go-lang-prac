@@ -12,5 +12,6 @@ func Router() *gin.Engine {
 	server.POST("/login", event.Login)
 	server.POST("/posts", middleware.Authentication, event.CreatePost)
 	server.GET("/posts", event.GetPosts)
+	server.PUT("/posts/:id", middleware.Authentication, event.UpDatePosts)
 	return server
 }

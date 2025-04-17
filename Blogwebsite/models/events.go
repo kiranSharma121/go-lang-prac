@@ -80,6 +80,27 @@ func GetAllPost() ([]Post, error) {
 	return posts, nil
 
 }
+func GetPostById(postid int) (*Post, error) {
+	query := "SELECT * FROM posts WHERE postid=?"
+	row := database.DB.QueryRow(query, postid)
+	var post Post
+	err := row.Scan(&post.Postid, &post.Authorid, &post.Author, &post.Title, &post.Content)
+	if err != nil {
+		return nil, err
+	}
+	return &post, err
+}
+func (p Post) UpDatePost() error {
+	query := `UPDATE posts SET authorid=?,author=?,title=?,content=? WHERE postid=? `
+	stmt, err := database.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(p.Authorid, p.Author, p.Title, p.Content, p.Postid)
+	return err
+
+}
 func HasedPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
