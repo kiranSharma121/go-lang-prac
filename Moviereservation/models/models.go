@@ -18,7 +18,6 @@ type Movie struct {
 type Showtime struct {
 	Showtimeid int `json:"showtimeid"`
 	Movieid    int `json:"movieid"`
-	Movie      Movie
 	StartAT    time.Time
 	Capacity   int `json:"capacity" binding:"require"`
 }
