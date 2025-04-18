@@ -8,5 +8,6 @@ import (
 func Router() *gin.Engine {
 	server := gin.Default()
 	server.POST("/signup", controllers.Signup)
+	server.POST("/login", controllers.Login)
 	return server
 }

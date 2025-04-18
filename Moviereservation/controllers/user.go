@@ -30,3 +30,25 @@ func Signup(c *gin.Context) {
 	})
 
 }
+func Login(c *gin.Context) {
+	var user models.User
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to bind the json",
+			"error":   err.Error(),
+		})
+		return
+	}
+	err = user.Validatecredentials()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to validate user",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK,gin.H{
+		"message":"login successful",
+	})
+}
