@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/movie/models"
+	"github.com/movie/utils"
 )
 
 func Signup(c *gin.Context) {
@@ -48,7 +49,15 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK,gin.H{
-		"message":"login successful",
+	token, err := utils.GeneratejwtToken(user.Userid, user.UserName, user.Email, user.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error in generating the token",
+			"error":   err.Error(),
+		})
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "login successful",
+		"token":   token,
 	})
 }
