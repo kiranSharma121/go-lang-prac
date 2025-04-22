@@ -37,3 +37,17 @@ func (u *User) Validatecredentials() error {
 	}
 	return nil
 }
+func (m *Movie) Save() error {
+	query := `INSERT INTO movies(title,description,genre,userid) VALUES(?,?,?,?)`
+	stmt, err := database.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	result, err := stmt.Exec(m.Title, m.Description, m.Genre, m.Userid)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	m.Movieid = id
+	return err
+}

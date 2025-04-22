@@ -34,7 +34,9 @@ role TEXT NOT NULL
 	movieid INTEGER PRIMARY KEY AUTOINCREMENT,
 	title TEXT NOT NULL UNIQUE,
 	description TEXT NOT NULL,
-	genre TEXT NOT NULL
+	genre TEXT NOT NULL,
+	userid INTEGER NOT NULL, 
+	FOREIGN KEY (userid) REFERENCES users(userid)
 	
 	)`
 	_, err = DB.Exec(CreateMovieTable)

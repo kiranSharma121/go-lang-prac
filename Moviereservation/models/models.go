@@ -10,10 +10,11 @@ type User struct {
 	Role     string `json:"role" binding:"required"`
 }
 type Movie struct {
-	Movieid     int    `json:"movieid"`
+	Movieid     int64  `json:"movieid"`
 	Title       string `json:"title" binding:"required"`
 	Description string `json:"description" binding:"required"`
 	Genre       string `json:"genre" binding:"required"`
+	Userid      int64  `json:"userid"`
 }
 type Showtime struct {
 	Showtimeid int `json:"showtimeid"`
