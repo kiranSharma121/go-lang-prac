@@ -11,5 +11,7 @@ func Router() *gin.Engine {
 	server.POST("/signup", controllers.Signup)
 	server.POST("/login", controllers.Login)
 	server.POST("/movies", middleware.Authentication, controllers.CreateMovies)
+	server.GET("/movies", controllers.GetAllMovies)
+	server.PUT("/movies/:id", middleware.Authentication, controllers.UpDateMovies)
 	return server
 }

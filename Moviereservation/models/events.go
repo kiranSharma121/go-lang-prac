@@ -51,3 +51,42 @@ func (m *Movie) Save() error {
 	m.Movieid = id
 	return err
 }
+func Getallmovies() ([]Movie, error) {
+	query := `SELECT * FROM movies`
+	row, err := database.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer row.Close()
+	var movies []Movie
+	for row.Next() {
+		var movie Movie
+		err := row.Scan(&movie.Movieid, &movie.Title, &movie.Description, &movie.Genre, &movie.Userid)
+		if err != nil {
+			return nil, err
+		}
+		movies = append(movies, movie)
+	}
+	return movies, nil
+}
+func GetMoviesById(movieid int) (*Movie, error) {
+	query := `SELECT * FROM movies WHERE movieid=?`
+	row := database.DB.QueryRow(query, movieid)
+	var movie Movie
+	err := row.Scan(&movie.Movieid, &movie.Title, &movie.Description, &movie.Genre, &movie.Userid)
+	if err != nil {
+		return nil, err
+	}
+	return &movie, nil
+
+}
+func (m Movie) Updatemovie() error {
+	query := `UPDATE movies SET movieid=?,title=?,description=?,genre=?,userid=?`
+	stmt, err := database.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(m.Movieid, m.Title, m.Description, m.Genre, m.Userid)
+	return err
+}

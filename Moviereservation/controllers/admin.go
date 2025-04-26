@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/movie/models"
@@ -47,4 +48,62 @@ func CreateMovies(c *gin.Context) {
 		"message": "stored data in the movie table successfully",
 	})
 
+}
+func GetAllMovies(c *gin.Context) {
+	movies, err := models.Getallmovies()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to get movies form database",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, movies)
+
+}
+func UpDateMovies(c *gin.Context) {
+	movieid, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "invalid params id",
+			"error":   err.Error(),
+		})
+		return
+	}
+	userid := c.GetInt64("userid")
+	movie, err := models.GetMoviesById(int(movieid))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "can't get movie with that id",
+			"error":   err.Error(),
+		})
+		return
+	}
+	if (movie.Movieid) != int64(userid) {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "unauthorized to update the movies",
+		})
+		return
+	}
+	var Updatemovie models.Movie
+	err = c.ShouldBindJSON(&Updatemovie)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to bind the json",
+			"error":   err.Error(),
+		})
+		return
+	}
+	Updatemovie.Userid = userid
+	Updatemovie.Movieid = movieid
+	err = Updatemovie.Updatemovie()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to update the movie",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "update the movies sucessfully",
+	})
 }
