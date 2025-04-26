@@ -107,3 +107,42 @@ func UpDateMovies(c *gin.Context) {
 		"message": "update the movies sucessfully",
 	})
 }
+func DeleteMovies(c *gin.Context) {
+	movieid, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "invalid params id",
+			"error":   err.Error(),
+		})
+		return
+	}
+	userid := c.GetInt64("userid")
+	movie, err := models.GetMoviesById(int(movieid))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to get movies form the id",
+			"error":   err.Error(),
+		})
+		return
+	}
+	if int(movie.Movieid) != int(userid) {
+		fmt.Printf("%T", movie.Movieid)
+		fmt.Printf("%T", userid)
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "unauthorized user",
+		})
+		return
+	}
+	err = movie.Deletemovies()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to delete the movie",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Deleted movie successfully",
+	})
+
+}

@@ -13,5 +13,6 @@ func Router() *gin.Engine {
 	server.POST("/movies", middleware.Authentication, controllers.CreateMovies)
 	server.GET("/movies", controllers.GetAllMovies)
 	server.PUT("/movies/:id", middleware.Authentication, controllers.UpDateMovies)
+	server.DELETE("/movies/:id", middleware.Authentication, controllers.DeleteMovies)
 	return server
 }

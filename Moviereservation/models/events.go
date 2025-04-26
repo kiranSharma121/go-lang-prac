@@ -90,3 +90,12 @@ func (m Movie) Updatemovie() error {
 	_, err = stmt.Exec(m.Movieid, m.Title, m.Description, m.Genre, m.Userid)
 	return err
 }
+func (m Movie) Deletemovies() error {
+	query := `DELETE FROM movies WHERE movieid=? `
+	stmt, err := database.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(m.Movieid)
+	return err
+}
