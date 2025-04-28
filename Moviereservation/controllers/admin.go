@@ -146,3 +146,34 @@ func DeleteMovies(c *gin.Context) {
 	})
 
 }
+func CreatShowTime(c *gin.Context) {
+	var shows models.Showtime
+	err := c.ShouldBindJSON(&shows)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to bind the json",
+		})
+		return
+	}
+	userid := c.GetInt64("userid")
+	role := c.GetString("role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "only admin can create show time table",
+		})
+		return
+	}
+	shows.Userid = userid
+	err = shows.Save()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to store data in the database",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "showtable is created...",
+	})
+
+}

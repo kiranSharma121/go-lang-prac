@@ -47,9 +47,11 @@ role TEXT NOT NULL
 	CreateShowTimeTable := `CREATE TABLE IF NOT EXISTS shows(
 	showtimeid INTEGER PRIMARY KEY AUTOINCREMENT,
 	movieid INTEGER NOT NULL,
+	userid INTEGER NOT NULL,
 	startat DATETIME NOT NULL,
 	capacity INTEGER NOT NULL,
-	FOREIGN KEY (movieid) REFERENCES movies(movieid)
+	FOREIGN KEY (movieid) REFERENCES movies(movieid),
+	FOREIGN KEY(userid)REFERENCES users(usersid)
 	)`
 	_, err = DB.Exec(CreateShowTimeTable)
 	if err != nil {
@@ -64,4 +66,19 @@ role TEXT NOT NULL
 	if err != nil {
 		panic("couldn't able to create the seat table")
 	}
+	CreateTableBooking := `CREATE TABLE IF NOT EXISTS booking(
+	bookingid INTEGER PRIMARY KEY AUTOINCREMENT,
+	userid INTEGER NOT NULL,
+	seatid INTEGER NOT  NULL,
+	showtimeid INTEGER NOT NULL,
+	bookat DATETIME NOT NULL,
+	FOREIGN KEY (userid) REFERENCES users(userid) ON DELETE CASCADE,
+    FOREIGN KEY (seatid) REFERENCES seats(seatid) ON DELETE CASCADE,
+    FOREIGN KEY (showtimeid) REFERENCES showtimes(showtimeid) ON DELETE CASCADE
+	)`
+	_, err = DB.Exec(CreateTableBooking)
+	if err != nil {
+		panic("couldn't able to creat the Table Booking")
+	}
+
 }

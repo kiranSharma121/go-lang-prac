@@ -99,3 +99,19 @@ func (m Movie) Deletemovies() error {
 	_, err = stmt.Exec(m.Movieid)
 	return err
 }
+
+func (s *Showtime) Save() error {
+	query := `INSERT INTO shows(movieid,userid, startat, capacity) VALUES(?,?,?,?)`
+	stmt, err := database.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	result, err := stmt.Exec(s.Movieid, s.Userid, s.StartAT, s.Capacity)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	s.Showtimeid = id
+	return err
+}
