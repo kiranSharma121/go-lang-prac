@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/movie/models"
@@ -155,15 +156,10 @@ func CreatShowTime(c *gin.Context) {
 		})
 		return
 	}
+	shows.StartAT = time.Now()
 	userid := c.GetInt64("userid")
-	role := c.GetString("role")
-	if role != "admin" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "only admin can create show time table",
-		})
-		return
-	}
 	shows.Userid = userid
+
 	err = shows.Save()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -176,4 +172,26 @@ func CreatShowTime(c *gin.Context) {
 		"message": "showtable is created...",
 	})
 
+}
+func CreateSeats(c *gin.Context) {
+	var seats models.Seat
+	err := c.ShouldBindJSON(&seats)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "couldn't bind the json",
+			"error":   err.Error(),
+		})
+		return
+	}
+	err = seats.Save()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "couldn't save in the database",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "stored the data in the seats",
+	})
 }

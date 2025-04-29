@@ -55,7 +55,7 @@ role TEXT NOT NULL
 	)`
 	_, err = DB.Exec(CreateShowTimeTable)
 	if err != nil {
-		panic("couldn;t able to create the showtime table")
+		panic("couldn't able to create the showtime table")
 	}
 	CreateSeatTable := `CREATE TABLE IF NOT EXISTS seats(
 	seatid INTEGER PRIMARY KEY AUTOINCREMENT,

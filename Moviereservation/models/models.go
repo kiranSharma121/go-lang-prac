@@ -24,7 +24,7 @@ type Showtime struct {
 	Capacity   int64     `json:"capacity" binding:"required"`
 }
 type Seat struct {
-	Seatid     int    `json:"seatid"`
+	Seatid     int64   `json:"seatid"`
 	SeatNumber string `json:"seatnumber" binding:"required"`
 	IsBooked   bool   `json:"isbooked"`
 }

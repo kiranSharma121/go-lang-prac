@@ -101,7 +101,7 @@ func (m Movie) Deletemovies() error {
 }
 
 func (s *Showtime) Save() error {
-	query := `INSERT INTO shows(movieid,userid, startat, capacity) VALUES(?,?,?,?)`
+	query := `INSERT INTO shows (movieid, userid, startat, capacity)VALUES(?,?,?,?)`
 	stmt, err := database.DB.Prepare(query)
 	if err != nil {
 		return err
@@ -113,5 +113,20 @@ func (s *Showtime) Save() error {
 	}
 	id, err := result.LastInsertId()
 	s.Showtimeid = id
+	return err
+}
+func (s *Seat) Save() error {
+	query := `INSERT INTO seats(seatnumber,isbooked)VALUES(?,?)`
+	stmt, err := database.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	result, err := stmt.Exec(s.SeatNumber, s.IsBooked)
+	if err != nil {
+		return err
+	}
+	id, err := result.LastInsertId()
+	s.Seatid = id
 	return err
 }
