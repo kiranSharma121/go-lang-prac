@@ -130,3 +130,21 @@ func (s *Seat) Save() error {
 	s.Seatid = id
 	return err
 }
+func Allseats() ([]Seat, error) {
+	query := `SELECT * FROM seats`
+	row, err := database.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer row.Close()
+	var seats []Seat
+	for row.Next() {
+		var seat Seat
+		err := row.Scan(&seat.Seatid, &seat.SeatNumber, &seat.IsBooked)
+		if err != nil {
+			return nil, err
+		}
+		seats = append(seats, seat)
+	}
+	return seats, nil
+}

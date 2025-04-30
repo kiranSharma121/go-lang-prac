@@ -50,18 +50,7 @@ func CreateMovies(c *gin.Context) {
 	})
 
 }
-func GetAllMovies(c *gin.Context) {
-	movies, err := models.Getallmovies()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "unable to get movies form database",
-			"error":   err.Error(),
-		})
-		return
-	}
-	c.JSON(http.StatusOK, movies)
 
-}
 func UpDateMovies(c *gin.Context) {
 	movieid, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {

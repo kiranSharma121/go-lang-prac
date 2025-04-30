@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/movie/models"
@@ -60,4 +61,46 @@ func Login(c *gin.Context) {
 		"message": "login successful",
 		"token":   token,
 	})
+}
+func GetAllMovies(c *gin.Context) {
+	movies, err := models.Getallmovies()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to get movies form database",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, movies)
+
+}
+func Getmoviebyid(c *gin.Context) {
+	movieid, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "invalid params id",
+			"error":   err.Error(),
+		})
+		return
+	}
+	movie, err := models.GetMoviesById(int(movieid))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "couldn't get movie by id",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, movie)
+}
+func GetAllSeats(c *gin.Context) {
+	seats, err := models.Allseats()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to get seats from the database",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, seats)
 }
