@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/movie/database"
 	"github.com/movie/utils"
 )
@@ -115,6 +117,45 @@ func (s *Showtime) Save() error {
 	s.Showtimeid = id
 	return err
 }
+func (s Showtime) Updateshowtime() error {
+	query := `UPDATE shows SET showtimeid=?,movieid=?,userid=?,startat=?,capacity=?`
+	stmt, err := database.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(s.Showtimeid, s.Movieid, s.Userid, s.StartAT, s.Capacity)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func Getshowsbyid(showtimeid int) (*Showtime, error) {
+	query := `SELECT * FROM shows WHERE showtimeid=?`
+	row := database.DB.QueryRow(query, showtimeid)
+	var showtime Showtime
+	err := row.Scan(&showtime.Showtimeid, &showtime.Movieid, &showtime.Userid, &showtime.StartAT, &showtime.Capacity)
+	if err != nil {
+		return nil, err
+	}
+	return &showtime, err
+}
+func Getallshowtime() ([]Showtime, error) {
+	query := `SELECT * FROM  shows`
+	row, err := database.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	var shows []Showtime
+	for row.Next() {
+		var show Showtime
+		err := row.Scan(&show.Showtimeid, &show.Movieid, &show.Userid, &show.StartAT, &show.Capacity)
+		if err != nil {
+			return nil, err
+		}
+		shows = append(shows, show)
+	}
+	return shows, err
+}
 func (s *Seat) Save() error {
 	query := `INSERT INTO seats(seatnumber,isbooked)VALUES(?,?)`
 	stmt, err := database.DB.Prepare(query)
@@ -130,6 +171,7 @@ func (s *Seat) Save() error {
 	s.Seatid = id
 	return err
 }
+
 func Allseats() ([]Seat, error) {
 	query := `SELECT * FROM seats`
 	row, err := database.DB.Query(query)
@@ -147,4 +189,36 @@ func Allseats() ([]Seat, error) {
 		seats = append(seats, seat)
 	}
 	return seats, nil
+}
+func (b *Booking) Save() error {
+	checkQuery := `SELECT COUNT(*) FROM booking WHERE seatid = ? AND showtimeid = ?`
+	var count int
+	err := database.DB.QueryRow(checkQuery, b.SeatID, b.ShowtimeID).Scan(&count)
+	if err != nil {
+		return fmt.Errorf("failed to check seat availability: %w", err)
+	}
+
+	if count > 0 {
+		return fmt.Errorf("seat already booked for this showtime")
+	}
+
+	
+	query := `INSERT INTO booking(userid, seatid, showtimeid, bookat) VALUES (?, ?, ?, ?)`
+	stmt, err := database.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	result, err := stmt.Exec(b.UserID, b.SeatID, b.ShowtimeID, b.BookedAt)
+	if err != nil {
+		return err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+	b.BookingID = id
+	return nil
 }

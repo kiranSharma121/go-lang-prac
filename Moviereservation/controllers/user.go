@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/movie/models"
@@ -74,6 +75,17 @@ func GetAllMovies(c *gin.Context) {
 	c.JSON(http.StatusOK, movies)
 
 }
+func GetAllShowTime(c *gin.Context) {
+	shows, err := models.Getallshowtime()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "can't get showtime form shows",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, shows)
+}
 func Getmoviebyid(c *gin.Context) {
 	movieid, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -103,4 +115,42 @@ func GetAllSeats(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, seats)
+}
+func BookingSeats(c *gin.Context) {
+	var booking models.Booking
+	err := c.ShouldBindJSON(&booking)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "couldn't bind the json",
+			"error":   err.Error(),
+		})
+		return
+	}
+	booking.BookedAt=time.Now();
+	role := c.GetString("role")
+	if role != "user" {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "user can only book the movie",
+		})
+		return
+	}
+	userid := c.GetInt64("userid")
+	if booking.UserID != userid {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "user is not authorized",
+		})
+		return
+	}
+	err = booking.Save()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to store data in the bookings",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "booked sucessfully",
+	})
+
 }

@@ -61,6 +61,13 @@ func UpDateMovies(c *gin.Context) {
 		return
 	}
 	userid := c.GetInt64("userid")
+	role := c.GetString("role")
+	if role != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "only admin can update movies",
+		})
+		return
+	}
 	movie, err := models.GetMoviesById(int(movieid))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -107,6 +114,13 @@ func DeleteMovies(c *gin.Context) {
 		return
 	}
 	userid := c.GetInt64("userid")
+	role := c.GetString("role")
+	if role != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "only admin can create movies",
+		})
+		return
+	}
 	movie, err := models.GetMoviesById(int(movieid))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -147,6 +161,13 @@ func CreatShowTime(c *gin.Context) {
 	}
 	shows.StartAT = time.Now()
 	userid := c.GetInt64("userid")
+	role := c.GetString("role")
+	if role != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "only admin can create movies",
+		})
+		return
+	}
 	shows.Userid = userid
 
 	err = shows.Save()
@@ -172,6 +193,13 @@ func CreateSeats(c *gin.Context) {
 		})
 		return
 	}
+	role := c.GetString("role")
+	if role != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "only admin can create movies",
+		})
+		return
+	}
 	err = seats.Save()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -182,5 +210,47 @@ func CreateSeats(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "stored the data in the seats",
+	})
+}
+func UpDateShowTime(c *gin.Context) {
+	showtimeid, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to get id form params",
+			"error":   err.Error(),
+		})
+		return
+	}
+	userid := c.GetInt64("userid")
+	showtime, err := models.Getshowsbyid(int(showtimeid))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to get showtime form the id",
+			"error":   err.Error(),
+		})
+		return
+	}
+	var show models.Showtime
+	err = c.ShouldBindJSON(&show)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to bind the json",
+		})
+		return
+	}
+	showtime.Showtimeid = showtimeid
+	showtime.Movieid = show.Movieid
+	showtime.Userid = userid
+	showtime.StartAT = show.StartAT
+	showtime.Capacity = show.Capacity
+	err = showtime.Updateshowtime()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error in updateshowtime in database",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "showtime is updated successfully",
 	})
 }

@@ -18,5 +18,8 @@ func Router() *gin.Engine {
 	server.POST("/shows", middleware.Authentication, controllers.CreatShowTime)
 	server.POST("/seats", middleware.Authentication, controllers.CreateSeats)
 	server.GET("/seats", controllers.GetAllSeats)
+	server.GET("/shows", controllers.GetAllShowTime)
+	server.PUT("/shows/:id", middleware.Authentication, controllers.UpDateShowTime)
+	server.POST("/booking", middleware.Authentication, controllers.BookingSeats)
 	return server
 }
