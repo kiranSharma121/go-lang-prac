@@ -52,7 +52,7 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-	token, err := Generatejwttoken(user.Id, user.Name, user.Email, user.Role)
+	token, err := Generatejwttoken(retriveinfo.Id, retriveinfo.Name, retriveinfo.Email, retriveinfo.Role)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "unable to generate jwt token",
