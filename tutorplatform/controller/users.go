@@ -8,7 +8,7 @@ import (
 	"github.com/tutorplatform/model"
 )
 
-func CreateUser(c *gin.Context) {
+func Signup(c *gin.Context) {
 	var user model.User
 	err := c.ShouldBindJSON(&user)
 	if err != nil {
@@ -18,9 +18,44 @@ func CreateUser(c *gin.Context) {
 		})
 		return
 	}
+	hashpassword, err := Hashpassword(user.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"messsage": "unable to hased the password",
+			"error":    err.Error(),
+		})
+		return
+	}
+	user.Password = hashpassword
 	database.DB.Create(&user)
 	c.JSON(http.StatusOK, user)
-
+}
+func Login(c *gin.Context) {
+	var user model.User
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to bind the json",
+			"error":   err.Error(),
+		})
+		return
+	}
+	var retriveinfo model.User
+	err = database.DB.Where("email = ?", user.Email).First(&retriveinfo).Error
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email not registered"})
+		return
+	}
+	if !Comparepassword(user.Password, retriveinfo.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "invalid username or password",
+		})
+		return
+	}
+	retriveinfo.Password = ""
+	c.JSON(http.StatusOK, gin.H{
+		"message": "login successfully",
+	})
 }
 func GetUser(c *gin.Context) {
 	var user []model.User
