@@ -52,9 +52,17 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-	retriveinfo.Password = ""
+	token, err := Generatejwttoken(user.Id, user.Name, user.Email, user.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to generate jwt token",
+			"error":   err.Error(),
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "login successfully",
+		"token":   token,
 	})
 }
 func GetUser(c *gin.Context) {
