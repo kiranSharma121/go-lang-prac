@@ -3,6 +3,7 @@ package controller
 import (
 	"errors"
 	"os"
+	"strings"
 
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -26,9 +27,11 @@ func Generatejwttoken(id int, name, email, role string) (string, error) {
 	})
 	return token.SignedString([]byte(secretKey))
 }
-
 func Verifyjwttoken(tokenString string) (string, int, error) {
 	secretKey := os.Getenv("JWT_SECRET")
+
+	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+
 	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unauthorized signing method")
@@ -39,18 +42,22 @@ func Verifyjwttoken(tokenString string) (string, int, error) {
 	if err != nil {
 		return "", 0, err
 	}
+
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
 		return "", 0, errors.New("invalid jwt token claims")
 	}
+
 	role, ok := claims["role"].(string)
 	if !ok {
 		return "", 0, errors.New("role not found in the token")
 	}
-	id, ok := claims["id"].(int)
+
+	idFloat, ok := claims["id"].(float64)
 	if !ok {
 		return "", 0, errors.New("id not found in the token")
 	}
-	return role, id, err
+	id := int(idFloat)
 
+	return role, id, nil
 }
