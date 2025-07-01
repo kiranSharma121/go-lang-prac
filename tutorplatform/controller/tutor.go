@@ -29,3 +29,34 @@ func CreateCourse(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, course)
 }
+func DeleteCourse(c *gin.Context) {
+	tutorid, _ := c.Get("id")
+	courseId := c.Param("id")
+	var course model.Course
+	err := database.DB.First(&course, courseId).Error
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "can't find the course with that id",
+			"error":   err.Error(),
+		})
+		return
+	}
+	if course.TutorId != int(tutorid.(int)) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "Only you can delete the course that you have created",
+		})
+		return
+
+	}
+	err = database.DB.Delete(&course).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "failed to delete the course",
+			"error":   err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Deleted the course successfully",
+	})
+}
