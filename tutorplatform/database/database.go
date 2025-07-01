@@ -18,7 +18,7 @@ func Connection() {
 	}
 	DB = database
 	log.Println("connected to the database sucessfully")
-	err = DB.AutoMigrate(&model.User{}, &model.Course{})
+	err = DB.AutoMigrate(&model.User{}, &model.Course{}, &model.Enrollment{})
 	if err != nil {
 		log.Fatal("Migration failed:", err)
 	}

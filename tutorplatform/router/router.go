@@ -15,6 +15,7 @@ func Router() *gin.Engine {
 	{
 		studentGroup.GET("/dashboard", controller.StudentDashboard)
 		studentGroup.GET("/courses", controller.GetCourse)
+		studentGroup.POST("/enroll/:courseID", controller.EnrollInCourse)
 	}
 	TeacherGroup := router.Group("/tutor")
 	TeacherGroup.Use(middleware.Authentication, middleware.TutorOnly())
@@ -23,6 +24,5 @@ func Router() *gin.Engine {
 		TeacherGroup.POST("/course", controller.CreateCourse)
 		TeacherGroup.DELETE("/course/:id", controller.DeleteCourse)
 	}
-
 	return router
 }

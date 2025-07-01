@@ -18,7 +18,7 @@ func CreateCourse(c *gin.Context) {
 		return
 	}
 	tutorid, _ := c.Get("id")
-	course.TutorId = int(tutorid.(int))
+	course.TutorID = uint(tutorid.(int))
 	err = database.DB.Create(&course).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -41,7 +41,7 @@ func DeleteCourse(c *gin.Context) {
 		})
 		return
 	}
-	if course.TutorId != int(tutorid.(int)) {
+	if course.TutorID != uint(tutorid.(int)) {
 		c.JSON(http.StatusForbidden, gin.H{
 			"message": "Only you can delete the course that you have created",
 		})

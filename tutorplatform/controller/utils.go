@@ -17,7 +17,7 @@ func Comparepassword(password, hashedpassword string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedpassword), []byte(password))
 	return err == nil
 }
-func Generatejwttoken(id int, name, email, role string) (string, error) {
+func Generatejwttoken(id uint, name, email, role string) (string, error) {
 	secretKey := os.Getenv("JWT_SECRET")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":    id,
