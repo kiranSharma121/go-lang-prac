@@ -9,7 +9,7 @@ type User struct {
 }
 type Course struct {
 	Id      int    `json:"id" gorm:"primarykey"`
-	Title   string `json:"title"`
+	Title   string `json:"title" gorm:"unique"`
 	Content string `json:"content"`
 	TutorId int    `json:"tutorid"`
 }

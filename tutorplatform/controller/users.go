@@ -52,7 +52,7 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
-token, err := Generatejwttoken(retriveinfo.Id, retriveinfo.Name, retriveinfo.Email, retriveinfo.Role)
+	token, err := Generatejwttoken(retriveinfo.Id, retriveinfo.Name, retriveinfo.Email, retriveinfo.Role)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "unable to generate jwt token",
@@ -65,8 +65,14 @@ token, err := Generatejwttoken(retriveinfo.Id, retriveinfo.Name, retriveinfo.Ema
 		"token":   token,
 	})
 }
-func GetUser(c *gin.Context) {
-	var user []model.User
-	database.DB.Find(&user)
-	c.JSON(http.StatusOK, user)
+func GetCourse(c *gin.Context) {
+	var course []model.Course
+	err := database.DB.Find(&course).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "couldn't fetch the course",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, course)
 }

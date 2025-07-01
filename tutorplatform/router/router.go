@@ -9,12 +9,12 @@ import (
 func Router() *gin.Engine {
 	router := gin.Default()
 	router.POST("/signup", controller.Signup)
-	router.GET("/getuser", controller.GetUser)
 	router.POST("/login", controller.Login)
 	studentGroup := router.Group("/student")
 	studentGroup.Use(middleware.Authentication, middleware.StudentOnly())
 	{
 		studentGroup.GET("/dashboard", controller.StudentDashboard)
+		studentGroup.GET("/courses", controller.GetCourse)
 	}
 	TeacherGroup := router.Group("/tutor")
 	TeacherGroup.Use(middleware.Authentication, middleware.TutorOnly())
