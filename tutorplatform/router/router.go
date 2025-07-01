@@ -20,6 +20,7 @@ func Router() *gin.Engine {
 	TeacherGroup.Use(middleware.Authentication, middleware.TutorOnly())
 	{
 		TeacherGroup.GET("/dashboard", controller.TutorDashboard)
+		TeacherGroup.POST("/course", controller.CreateCourse)
 	}
 
 	return router

@@ -7,3 +7,9 @@ type User struct {
 	Password string `json:"password" binding:"required"`
 	Role     string `json:"role"`
 }
+type Course struct {
+	Id      int    `json:"id" gorm:"primarykey"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	TutorId int    `json:"tutorid"`
+}
