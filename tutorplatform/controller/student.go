@@ -52,3 +52,21 @@ func EnrollInCourse(c *gin.Context) {
 		"message": "Enrollment in the course successfully",
 	})
 }
+func EnrollCourse(c *gin.Context) {
+	studentIDRaw, _ := c.Get("id")
+	studentID := studentIDRaw.(int)
+	var enrollment []model.Enrollment
+	err := database.DB.Preload("Course").Where("student_id", studentID).Find(&enrollment).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "fail to fetch the data",
+			"error":   err.Error(),
+		})
+		return
+	}
+	var myCourses []model.Course
+	for _, e := range enrollment {
+		myCourses = append(myCourses, e.Course)
+	}
+	c.JSON(http.StatusOK, myCourses)
+}
