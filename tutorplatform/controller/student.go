@@ -28,6 +28,14 @@ func EnrollInCourse(c *gin.Context) {
 		return
 	}
 	studentID, _ := c.Get("id")
+	var existing model.Enrollment
+	err = database.DB.Where("course_id=? AND student_id=?", courseID, studentID).First(&existing).Error
+	if err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Already enroll in the course",
+		})
+		return
+	}
 	entrollment := model.Enrollment{
 		CourseID:  uint(courseID),
 		StudentID: uint(studentID.(int)),
@@ -41,6 +49,6 @@ func EnrollInCourse(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"message": "enrollment in the course successfully",
+		"message": "Enrollment in the course successfully",
 	})
 }
