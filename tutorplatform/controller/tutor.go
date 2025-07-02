@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tutorplatform/database"
@@ -58,5 +59,40 @@ func DeleteCourse(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Deleted the course successfully",
+	})
+}
+func UpdateCourses(c *gin.Context) {
+	courseID, _ := strconv.Atoi(c.Param("id"))
+	tutorID := c.GetInt("id")
+	var course model.Course
+	err := database.DB.First(&course, courseID).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "couldn't find the course",
+			"error":   err.Error(),
+		})
+		return
+	}
+	if course.TutorID != uint(tutorID) {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "you can't update the course",
+		})
+		return
+	}
+	var input struct {
+		Title   string `json:"title"`
+		Content string `json:"content"`
+	}
+	err = c.ShouldBind(&input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "can't bind the json",
+		})
+	}
+	course.Title = input.Title
+	course.Content = input.Content
+	database.DB.Save(&course)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "course updated", "course": course,
 	})
 }
