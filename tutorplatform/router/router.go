@@ -25,6 +25,7 @@ func Router() *gin.Engine {
 		TeacherGroup.POST("/course", controller.CreateCourse)
 		TeacherGroup.DELETE("/course/:id", controller.DeleteCourse)
 		TeacherGroup.PUT("/course/:id", controller.UpdateCourses)
+		TeacherGroup.GET("/:id/students", controller.EnrollStudent)
 	}
 	return router
 }

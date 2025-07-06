@@ -96,3 +96,47 @@ func UpdateCourses(c *gin.Context) {
 		"message": "course updated", "course": course,
 	})
 }
+func EnrollStudent(c *gin.Context) {
+	courseID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "invalid course id",
+		})
+		return
+	}
+	tutorID := c.GetInt("id")
+	var course model.Course
+	err = database.DB.First(&course, courseID).Error
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "course not found",
+			"error":   err.Error(),
+		})
+		return
+	}
+	if course.TutorID != uint(tutorID) {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "you can't access to the course",
+		})
+		return
+	}
+	var enrollment []model.Enrollment
+	err = database.DB.Preload("Student").Where("course_id=?", courseID).Find(&enrollment).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "failed to get student",
+		})
+		return
+	}
+	var students []map[string]interface{}
+	for _, e := range enrollment {
+		student := map[string]interface{}{
+			"ID":    e.Student.ID,
+			"Name":  e.Student.Name,
+			"Email": e.Student.Email,
+		}
+		students = append(students, student)
+	}
+	c.JSON(http.StatusOK, students)
+
+}
