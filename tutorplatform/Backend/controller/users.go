@@ -29,19 +29,8 @@ func Signup(c *gin.Context) {
 	user.Password = hashpassword
 	database.DB.Create(&user)
 
-	token, err := Generatejwttoken(user.ID, user.Name, user.Email, user.Role)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "unable to generate jwt token",
-			"error":   err.Error(),
-		})
-		return
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"message": "signup successful",
-		"token":   token,
-		"user":    user,
 	})
 }
 

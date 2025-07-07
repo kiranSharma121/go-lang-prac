@@ -28,6 +28,7 @@ func Router() *gin.Engine {
 		studentGroup.GET("/courses", controller.GetCourse)
 		studentGroup.POST("/enroll/:courseID", controller.EnrollInCourse)
 		studentGroup.GET("/my-courses", controller.EnrollCourse)
+		studentGroup.POST("/pay/:id", controller.Payment)
 	}
 	TeacherGroup := router.Group("/tutor")
 	TeacherGroup.Use(middleware.Authentication, middleware.TutorOnly())
