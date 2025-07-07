@@ -21,6 +21,7 @@ func Router() *gin.Engine {
 	}))
 	router.POST("/signup", controller.Signup)
 	router.POST("/login", controller.Login)
+	router.POST("/webhook", controller.Webhook)
 	studentGroup := router.Group("/student")
 	studentGroup.Use(middleware.Authentication, middleware.StudentOnly())
 	{
