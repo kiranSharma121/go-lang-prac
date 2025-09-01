@@ -31,3 +31,30 @@ func SignUp(c *gin.Context) {
 		"message": "signup successfully...",
 	})
 }
+func Login(c *gin.Context) {
+	var user model.User
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to bind the json",
+		})
+		return
+	}
+	var retriveinfo model.User
+	err = database.DB.Where("email=?", user.Email).First(&retriveinfo).Error
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "email is not register",
+		})
+		return
+	}
+	if !CompareHashPassword(user.Password, retriveinfo.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Invalid username or password",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "login successfully...",
+	})
+}
