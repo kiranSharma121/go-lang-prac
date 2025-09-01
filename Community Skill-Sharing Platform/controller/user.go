@@ -27,8 +27,10 @@ func SignUp(c *gin.Context) {
 	}
 	user.Password = hashPassword
 	database.DB.Create(&user)
+	// implemend the token jwt token return , the user must see the token
 	c.JSON(http.StatusOK, gin.H{
 		"message": "signup successfully...",
+		"user":    user,
 	})
 }
 func Login(c *gin.Context) {
@@ -54,7 +56,16 @@ func Login(c *gin.Context) {
 		})
 		return
 	}
+	token, err := GenerateJwtToken(retriveinfo.ID, retriveinfo.Name, retriveinfo.Email, retriveinfo.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to generate jwt token",
+			"error":   err.Error(),
+		})
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "login successfully...",
+		"token":   token,
 	})
+
 }
