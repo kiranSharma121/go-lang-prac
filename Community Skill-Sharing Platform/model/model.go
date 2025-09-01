@@ -55,3 +55,11 @@ type Notification struct {
 	IsRead    bool      `gorm:"default:false" json:"is_read"`
 	CreatedAt time.Time `json:"created_at"`
 }
+type Enrollment struct {
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	SkillID   uint      `json:"skill_id"`
+	Skill     Skill     `gorm:"foreignKey:SkillID" json:"skill"`
+	LearnerID uint      `json:"learner_id"`
+	Learner   User      `gorm:"foreignKey:LearnerID" json:"learner"`
+	CreatedAt time.Time `json:"created_at"`
+}
