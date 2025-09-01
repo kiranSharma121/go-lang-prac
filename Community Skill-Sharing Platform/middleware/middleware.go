@@ -29,3 +29,42 @@ func Authentication(c *gin.Context) {
 	c.Set("id", id)
 	c.Next()
 }
+func LearnerOnly() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, exists := c.Get("role")
+		if !exists || role != "learner" {
+			c.JSON(http.StatusForbidden, gin.H{
+				"message": "Access forbidden...Learner only",
+			})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+func MentorOnly() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, exits := c.Get("role")
+		if !exits || role != "mentor" {
+			c.JSON(http.StatusForbidden, gin.H{
+				"message": "Access Forbidden...only fo the mentor",
+			})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+func AdminOnly() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, exits := c.Get("role")
+		if !exits || role != "admin" {
+			c.JSON(http.StatusForbidden, gin.H{
+				"message": "Access Forbiden.. AdminOnly",
+			})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}

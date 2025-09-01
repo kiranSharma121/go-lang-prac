@@ -27,7 +27,6 @@ func SignUp(c *gin.Context) {
 	}
 	user.Password = hashPassword
 	database.DB.Create(&user)
-	// implemend the token jwt token return , the user must see the token
 	c.JSON(http.StatusOK, gin.H{
 		"message": "signup successfully...",
 		"user":    user,
