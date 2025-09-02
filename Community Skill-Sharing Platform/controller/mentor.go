@@ -60,3 +60,40 @@ func DeleteSkill(c *gin.Context) {
 		"message": "Deleted skill successfully",
 	})
 }
+func UpdateSkill(c *gin.Context) {
+	skillID := c.Param("id")
+	userID, _ := c.Get("id")
+	var skill model.Skill
+	err := database.DB.First(&skill, skillID).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to findt the skill witht that id",
+		})
+		return
+	}
+	if skill.UserID != uint(userID.(int)) {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "only the author can edit the skill field",
+		})
+		return
+	}
+	var input struct {
+		Title       string ` json:"title"`
+		Description string `json:"description"`
+		Category    string `json:"category"`
+	}
+	err = c.ShouldBindJSON(&input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to bind the json",
+		})
+		return
+	}
+	skill.Title = input.Title
+	skill.Description = input.Description
+	skill.Category = input.Category
+	c.JSON(http.StatusOK, gin.H{
+		"message": "skill field updated successfully",
+		"skill":   skill,
+	})
+}
