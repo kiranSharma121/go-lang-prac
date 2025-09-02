@@ -21,8 +21,8 @@ type User struct {
 
 type Skill struct {
 	ID          uint      `gorm:"primaryKey" json:"id"`
-	UserID      uint      `json:"user_id"`
-	Title       string    `gorm:"not null;uniqueIndex:idx_user_skill" json:"title"`
+	UserID      uint      ` json:"user_id"`
+	Title       string    ` json:"title"`
 	Description string    `json:"description"`
 	Category    string    `json:"category"`
 	CreatedAt   time.Time `json:"created_at"`

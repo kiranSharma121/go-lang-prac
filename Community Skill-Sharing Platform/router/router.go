@@ -19,6 +19,7 @@ func Router() *gin.Engine {
 	MentorGroup.Use(middleware.Authentication, middleware.MentorOnly())
 	{
 		MentorGroup.POST("/skills", controller.CreateSkill)
+		MentorGroup.DELETE("/skill/:id", controller.DeleteSkill)
 	}
 	AdminGroup := router.Group("/admin")
 	AdminGroup.Use(middleware.Authentication, middleware.AdminOnly())
