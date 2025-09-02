@@ -18,7 +18,7 @@ func Router() *gin.Engine {
 	MentorGroup := router.Group("/mentor")
 	MentorGroup.Use(middleware.Authentication, middleware.MentorOnly())
 	{
-
+		MentorGroup.POST("/skills", controller.CreateSkill)
 	}
 	AdminGroup := router.Group("/admin")
 	AdminGroup.Use(middleware.Authentication, middleware.AdminOnly())
