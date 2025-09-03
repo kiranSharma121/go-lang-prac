@@ -47,7 +47,7 @@ func MentorOnly() gin.HandlerFunc {
 		role, exits := c.Get("role")
 		if !exits || role != "mentor" {
 			c.JSON(http.StatusForbidden, gin.H{
-				"message": "Access Forbidden...only fo the mentor",
+				"message": "Access Forbidden...only for the mentor",
 			})
 			c.Abort()
 			return

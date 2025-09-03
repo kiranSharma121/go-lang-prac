@@ -13,7 +13,7 @@ func Router() *gin.Engine {
 	LearnerGroup := router.Group("/learner")
 	LearnerGroup.Use(middleware.Authentication, middleware.LearnerOnly())
 	{
-
+		LearnerGroup.GET("/skills", controller.GetSkills)
 	}
 	MentorGroup := router.Group("/mentor")
 	MentorGroup.Use(middleware.Authentication, middleware.MentorOnly())

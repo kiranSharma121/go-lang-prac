@@ -67,7 +67,7 @@ func UpdateSkill(c *gin.Context) {
 	err := database.DB.First(&skill, skillID).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "unable to findt the skill witht that id",
+			"message": "unable to find the skill with that id",
 		})
 		return
 	}
