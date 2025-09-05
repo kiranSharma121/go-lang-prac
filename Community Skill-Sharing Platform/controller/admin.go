@@ -53,3 +53,14 @@ func DeleteUser(c *gin.Context) {
 	})
 
 }
+func ListSkills(c *gin.Context) {
+	var skill []model.Skill
+	err := database.DB.Find(&skill).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to find the skills",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, skill)
+}
