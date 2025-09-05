@@ -20,3 +20,17 @@ func ListUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 
 }
+func ListEnrollments(c *gin.Context) {
+	var enrollment []model.Enrollment
+	err := database.DB.Preload("Learner").Preload("Skill").Find(&enrollment).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to find the enrollments",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, enrollment)
+}
+func DeleteUser(c *gin.Context){
+	
+}

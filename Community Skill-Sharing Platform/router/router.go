@@ -28,6 +28,7 @@ func Router() *gin.Engine {
 	AdminGroup.Use(middleware.Authentication, middleware.AdminOnly())
 	{
 		AdminGroup.GET("/users", controller.ListUser)
+		AdminGroup.GET("/enrollments", controller.ListEnrollments)
 
 	}
 
