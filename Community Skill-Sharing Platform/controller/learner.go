@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/skillplatform/database"
@@ -75,4 +77,54 @@ func EnrolledCourse(c *gin.Context) {
 		skills = append(skills, e.Skill)
 	}
 	c.JSON(http.StatusOK, skills)
+}
+func CreateSession(c *gin.Context) {
+	learnerID, exist := c.Get("id")
+	if !exist {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "unauthorized user,user not exist",
+		})
+		return
+	}
+	var input struct {
+		MentorID uint      `json:"mentor_id"`
+		Time     time.Time `json:"time"`
+	}
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to bind the json",
+		})
+		return
+	}
+	session := model.Session{
+		LearnerID: uint(learnerID.(int)),
+		MentorID:  input.MentorID,
+		Time:      input.Time,
+		Status:    "pending",
+	}
+	err = database.DB.Create(&session).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to create session table in database",
+		})
+		return
+	}
+	notification := model.Notification{
+		UserID:  input.MentorID,
+		Type:    "session_request",
+		Content: fmt.Sprintf("You have a new session request from learner %d", learnerID),
+	}
+	err = database.DB.Create(&notification).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to create the table notification in the database",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "session has been created successfully",
+		"session": session,
+	})
+
 }
