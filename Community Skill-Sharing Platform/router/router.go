@@ -29,6 +29,7 @@ func Router() *gin.Engine {
 	{
 		AdminGroup.GET("/users", controller.ListUser)
 		AdminGroup.GET("/enrollments", controller.ListEnrollments)
+		AdminGroup.DELETE("/users/:id", controller.DeleteUser)
 
 	}
 

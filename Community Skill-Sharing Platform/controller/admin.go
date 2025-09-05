@@ -31,6 +31,25 @@ func ListEnrollments(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, enrollment)
 }
-func DeleteUser(c *gin.Context){
-	
+func DeleteUser(c *gin.Context) {
+	userID := c.Param("id")
+	var user model.User
+	err := database.DB.Find(&user, userID).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to find the user with that id",
+		})
+		return
+	}
+	err = database.DB.Delete(&user).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to delete the user",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Deleted user successfully",
+	})
+
 }
