@@ -27,6 +27,7 @@ func Router() *gin.Engine {
 	AdminGroup := router.Group("/admin")
 	AdminGroup.Use(middleware.Authentication, middleware.AdminOnly())
 	{
+		AdminGroup.GET("/users", controller.ListUser)
 
 	}
 
