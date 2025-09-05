@@ -64,3 +64,17 @@ func ListSkills(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, skill)
 }
+func Deleteskill(c *gin.Context) {
+	var skill model.Skill
+	skillID := c.Param("id")
+	err := database.DB.Delete(&skill, skillID).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to delete skill from the database",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Deleted skill successfully",
+	})
+}
