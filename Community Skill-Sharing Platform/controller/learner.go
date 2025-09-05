@@ -60,3 +60,19 @@ func EnrollinCourse(c *gin.Context) {
 	database.DB.Preload("Skill").Preload("Learner").First(&enrollment, enrollment.ID)
 	c.JSON(http.StatusOK, enrollment)
 }
+func EnrolledCourse(c *gin.Context) {
+	learnerID, _ := c.Get("id")
+	var enrollment []model.Enrollment
+	err := database.DB.Preload("Skill").Where("learner_id=?", learnerID).Find(&enrollment).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to fetch the data",
+		})
+		return
+	}
+	var skills []model.Skill
+	for _, e := range enrollment {
+		skills = append(skills, e.Skill)
+	}
+	c.JSON(http.StatusOK, skills)
+}
