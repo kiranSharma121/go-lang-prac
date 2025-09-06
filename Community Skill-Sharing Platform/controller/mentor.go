@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -95,5 +96,52 @@ func UpdateSkill(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "skill field updated successfully",
 		"skill":   skill,
+	})
+}
+func UpdateSession(c *gin.Context) {
+	mentorId, _ := c.Get("id")
+	id := c.Param("id")
+	var session model.Session
+	err := database.DB.Find(&session, id).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to find the session with the id",
+		})
+		return
+	}
+	var input struct {
+		Status string `json:"status"`
+	}
+	err = c.ShouldBindJSON(&input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to bind the json",
+		})
+		return
+	}
+	allowed := map[string]bool{"pending": true, "accepted": true, "rejected": true, "completed": true}
+	if !allowed[input.Status] {
+		c.JSON(http.StatusNotAcceptable, gin.H{
+			"message": "invalid status",
+		})
+		return
+	}
+	session.Status = input.Status
+	database.DB.Create(&session)
+	notification := model.Notification{
+		UserID:  session.LearnerID,
+		Type:    "session_request",
+		Content: fmt.Sprintf("You have a new session request from mentor %d", mentorId),
+	}
+	err = database.DB.Create(&notification).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to create the notification",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "session updated",
+		"session": session,
 	})
 }

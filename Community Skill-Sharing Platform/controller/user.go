@@ -29,7 +29,6 @@ func SignUp(c *gin.Context) {
 	database.DB.Create(&user)
 	c.JSON(http.StatusOK, gin.H{
 		"message": "signup successfully...",
-		"user":    user,
 	})
 }
 func Login(c *gin.Context) {
