@@ -17,6 +17,7 @@ func Router() *gin.Engine {
 		LearnerGroup.POST("/skill/:id", controller.EnrollinCourse)
 		LearnerGroup.GET("/myskills", controller.EnrolledCourse)
 		LearnerGroup.POST("/sessions", controller.CreateSession)
+		LearnerGroup.GET("/mysessions", controller.ListSession)
 	}
 	MentorGroup := router.Group("/mentor")
 	MentorGroup.Use(middleware.Authentication, middleware.MentorOnly())

@@ -128,3 +128,14 @@ func CreateSession(c *gin.Context) {
 	})
 
 }
+func ListSession(c *gin.Context) {
+	var session []model.Session
+	err := database.DB.Find(&session).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unable to get session from the database",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, session)
+}
