@@ -2,9 +2,12 @@ package middleware
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/skillplatform/controller"
+	"github.com/skillplatform/database"
+	"github.com/skillplatform/model"
 )
 
 func Authentication(c *gin.Context) {
@@ -67,4 +70,28 @@ func AdminOnly() gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+func EnsureEnrollment(c *gin.Context) {
+	userID, _ := c.Get("id")
+	otherIDStr := c.Query("receiver_id")
+	otherID, err := strconv.ParseUint(otherIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid receiver_id",
+		})
+		c.Abort()
+		return
+	}
+	var enrollment model.Enrollment
+	err = database.DB.Joins("JOIN skills ON skills.id = enrollments.skill_id").Where("(enrollments.learner_id = ? AND skills.user_id = ?) OR (enrollments.learner_id = ? AND skills.user_id = ?)",
+		userID, otherID, otherID, userID).
+		First(&enrollment).Error
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "chat not allowed not valid enrollment",
+		})
+		c.Abort()
+		return
+	}
+	c.Next()
 }
