@@ -33,12 +33,8 @@ func EnrollinCourse(c *gin.Context) {
 		})
 		return
 	}
-	learnerID, exist := c.Get("id")
-	if !exist {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "invalid learner id",
-		})
-	}
+	learnerID := c.GetUint("id")
+
 	var existing model.Enrollment
 	err = database.DB.Where("skill_id=? AND learner_id=?", skillID, learnerID).First(&existing).Error
 	if err == nil {
@@ -49,7 +45,7 @@ func EnrollinCourse(c *gin.Context) {
 	}
 	enrollment := model.Enrollment{
 		SkillID:   uint(skillID),
-		LearnerID: uint(learnerID.(int)),
+		LearnerID: learnerID,
 	}
 	err = database.DB.Create(&enrollment).Error
 	if err != nil {
@@ -63,7 +59,7 @@ func EnrollinCourse(c *gin.Context) {
 	c.JSON(http.StatusOK, enrollment)
 }
 func EnrolledCourse(c *gin.Context) {
-	learnerID, _ := c.Get("id")
+	learnerID := c.GetUint("id")
 	var enrollment []model.Enrollment
 	err := database.DB.Preload("Skill").Where("learner_id=?", learnerID).Find(&enrollment).Error
 	if err != nil {
@@ -98,7 +94,7 @@ func CreateSession(c *gin.Context) {
 		return
 	}
 	session := model.Session{
-		LearnerID: uint(learnerID.(int)),
+		LearnerID: (learnerID.(uint)),
 		MentorID:  input.MentorID,
 		Time:      input.Time,
 		Status:    "pending",

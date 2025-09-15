@@ -18,8 +18,8 @@ func CreateSkill(c *gin.Context) {
 		})
 		return
 	}
-	MentorID, _ := c.Get("id")
-	skill.UserID = uint(MentorID.(int))
+	MentorID := c.GetUint("id")
+	skill.UserID = MentorID
 	err = database.DB.Create(&skill).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -34,7 +34,7 @@ func CreateSkill(c *gin.Context) {
 	})
 }
 func DeleteSkill(c *gin.Context) {
-	mentorID, _ := c.Get("id")
+	mentorID := c.GetUint("id")
 	skillID := c.Param("id")
 	var skill model.Skill
 	err := database.DB.First(&skill, skillID).Error
@@ -44,7 +44,7 @@ func DeleteSkill(c *gin.Context) {
 		})
 		return
 	}
-	if skill.UserID != uint(mentorID.(int)) {
+	if skill.UserID != mentorID {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "only the creater of the course can delete the course",
 		})
@@ -63,16 +63,16 @@ func DeleteSkill(c *gin.Context) {
 }
 func UpdateSkill(c *gin.Context) {
 	skillID := c.Param("id")
-	userID, _ := c.Get("id")
+	userID := c.GetUint("id")
 	var skill model.Skill
-	err := database.DB.First(&skill, skillID).Error
+	err := database.DB.Find(&skill, skillID).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "unable to find the skill with that id",
 		})
 		return
 	}
-	if skill.UserID != uint(userID.(int)) {
+	if skill.UserID != userID {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "only the author can edit the skill field",
 		})
@@ -99,47 +99,45 @@ func UpdateSkill(c *gin.Context) {
 	})
 }
 func UpdateSession(c *gin.Context) {
-	mentorId, _ := c.Get("id")
+	mentorId := c.GetUint("id")
 	id := c.Param("id")
+
 	var session model.Session
-	err := database.DB.Find(&session, id).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "unable to find the session with the id",
-		})
+	if err := database.DB.First(&session, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "session not found"})
 		return
 	}
+
 	var input struct {
 		Status string `json:"status"`
 	}
-	err = c.ShouldBindJSON(&input)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "unable to bind the json",
-		})
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid request", "error": err.Error()})
 		return
 	}
+
 	allowed := map[string]bool{"pending": true, "accepted": true, "rejected": true, "completed": true}
 	if !allowed[input.Status] {
-		c.JSON(http.StatusNotAcceptable, gin.H{
-			"message": "invalid status",
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid status"})
 		return
 	}
-	session.Status = input.Status
-	database.DB.Create(&session)
+
+	err := database.DB.Save(&session).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "unable to update session"})
+		return
+	}
+
 	notification := model.Notification{
 		UserID:  session.LearnerID,
-		Type:    "session_request",
-		Content: fmt.Sprintf("You have a new session request from mentor %d", mentorId),
+		Type:    "session_status",
+		Content: fmt.Sprintf("Your session with mentor %d is now %s", mentorId, input.Status),
 	}
-	err = database.DB.Create(&notification).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "unable to create the notification",
-		})
+	if err := database.DB.Create(&notification).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "unable to create notification"})
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "session updated",
 		"session": session,

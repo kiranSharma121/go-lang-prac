@@ -29,7 +29,7 @@ func Authentication(c *gin.Context) {
 		return
 	}
 	c.Set("role", role)
-	c.Set("id", id)
+	c.Set("id", uint(id))
 	c.Next()
 }
 func LearnerOnly() gin.HandlerFunc {
@@ -72,24 +72,25 @@ func AdminOnly() gin.HandlerFunc {
 	}
 }
 func EnsureEnrollment(c *gin.Context) {
-	userID, _ := c.Get("id")
+	userID := c.GetUint("id")
+
 	otherIDStr := c.Query("receiver_id")
-	otherID, err := strconv.ParseUint(otherIDStr, 10, 64)
+	otherIDUint64, err := strconv.ParseUint(otherIDStr, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "invalid receiver_id",
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid receiver_id"})
 		c.Abort()
 		return
 	}
+	otherID := uint(otherIDUint64)
 	var enrollment model.Enrollment
-	err = database.DB.Joins("JOIN skills ON skills.id = enrollments.skill_id").Where("(enrollments.learner_id = ? AND skills.user_id = ?) OR (enrollments.learner_id = ? AND skills.user_id = ?)",
-		userID, otherID, otherID, userID).
+	err = database.DB.
+		Joins("JOIN skills ON skills.id = enrollments.skill_id").
+		Where("(enrollments.learner_id = ? AND skills.user_id = ?) OR (enrollments.learner_id = ? AND skills.user_id = ?)",
+			userID, otherID, otherID, userID).
 		First(&enrollment).Error
+
 	if err != nil {
-		c.JSON(http.StatusForbidden, gin.H{
-			"message": "chat not allowed not valid enrollment",
-		})
+		c.JSON(http.StatusForbidden, gin.H{"message": "chat not allowed, no valid enrollment"})
 		c.Abort()
 		return
 	}

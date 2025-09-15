@@ -10,6 +10,7 @@ func Router() *gin.Engine {
 	router := gin.Default()
 	router.POST("/signup", controller.SignUp)
 	router.POST("/login", controller.Login)
+	router.GET("/ws/chat", controller.ChatHandler)
 	LearnerGroup := router.Group("/learner")
 	LearnerGroup.Use(middleware.Authentication, middleware.LearnerOnly())
 	{
